@@ -1,0 +1,32 @@
+
+C:\Users\Jui\Desktop
+C:\Program Files\Java\jdk1.8.0_05\bin
+
+
+
+
+
+1. Download the jflex-1.6.1.zip and unzip it.
+2. Assuming the location of the jflex-1.6.1 is C:\
+3. Go to C:\jflex-1.6.1\bin
+4. Open the jflex.bat in a text editor.
+5. Go to for the directory of the JDK (Probable location C:\Program Files\Java\jdk1.8.0_73) and copy the location.
+6. Set JAVA_HOME to the location. (set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_73)
+7. Similarly, set JFLEX_HOME to its home location. (set JFLEX_HOME=C:\jflex-1.6.1)
+8. Example jflex.bat
+@echo off
+REM Please adjusts JFLEX_HOME to suit your needs
+REM (please do not add a trailing backslash)
+set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_73
+set JFLEX_HOME=C:\jflex-1.6.1
+java -Xmx128m -jar %JFLEX_HOME%\lib\jflex-1.6.1.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
+save the file
+9. Open the command prompt in admin mode
+10. Type java
+If you see
+'java' is not recognized as an internal or external command, 
+ operable program or batch file.
+Then set the path of java permanently
+http://www.javatpoint.com/how-to-set-path-in-java
+N.B. Similarly, add the path of jflex (C:\jflex-1.6.1\bin) permanently.
+11. In the command prompt type jflex. If a popup window named jflex 1.6.1 then you are done with the process.

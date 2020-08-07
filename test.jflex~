@@ -1,0 +1,250 @@
+
+//user code
+import java.util.*;
+
+%%
+// options & dec.
+%standalone // this creates the main method, so don't have to create one
+%class test
+
+whitespace = [ \t\n]* // these will considered as white spaces
+keywordswithdot = [a-zA-Z]+[0-9]*(".")?[0-9]*[a-zA-Z]*[0-9]* // keywords, identifiers all are catched here. the "." is for stdio.h
+numbers = [0-9]+(".")?[0-9]* // for numbers
+moperators = ("++" | "--" | "+" | "-" | "*" | "/" | "=")*
+loperators = ("==" | "<=" | ">=" | "<" | ">")*
+bracket = [(){}]*
+
+%{
+
+// this is copied directly into java source code
+boolean stringflag = false; // to check if a " is seen already, if the flag is true, then we have already seen a " and this " marks the end of the string
+// if not then everything upto the next " is to be held for string
+
+String string = ""; // to get everything between two "
+LinkedList keywordsll = new LinkedList(); // holds keywords
+LinkedList functionsll = new LinkedList(); // holds functions
+LinkedList identifiersll = new LinkedList();
+LinkedList stringsll = new LinkedList();
+LinkedList numbersll = new LinkedList();
+LinkedList mathoperatorsll = new LinkedList();
+LinkedList logicaloperatorsll = new LinkedList();
+LinkedList bracketsll = new LinkedList();
+HashSet othershs = new HashSet(); // holds ; #
+
+String[] functionsarray = {"main", "printf", "scanf"}; 
+String[] keywordsarray = {"int", "float", "double", "if", "else", "for", "return", "include"};
+
+
+%}
+
+%eof{
+
+// this is run by jflex when the end of file is reached. all the elements of all the linkedlists are just printed in proper order
+
+System.out.print("Keywords: ");
+	for(int i=0;i<keywordsll.size();i++){
+		System.out.print(keywordsll.get(i));
+		if(i+1 == keywordsll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	
+	System.out.println();
+	
+	System.out.print("Functions: ");
+	for(int i=0;i<functionsll.size();i++){
+		System.out.print(functionsll.get(i));
+		if(i+1 == functionsll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	System.out.println();
+	
+	System.out.print("Identifiers: ");
+	for(int i=0;i<identifiersll.size();i++){
+		System.out.print(identifiersll.get(i));
+		if(i+1 == identifiersll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	System.out.println();
+	
+	System.out.print("Strings: ");
+	for(int i=0;i<stringsll.size();i++){
+		System.out.print(stringsll.get(i));
+		if(i+1 == stringsll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	System.out.println();
+	
+	
+	System.out.print("Numeric values: ");
+	for(int i=0;i<numbersll.size();i++){
+		System.out.print(numbersll.get(i));
+		if(i+1 == numbersll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	System.out.println();
+	
+	System.out.print("Math Operators: ");
+	for(int i=0;i<mathoperatorsll.size();i++){
+		System.out.print(mathoperatorsll.get(i));
+		if(i+1 == mathoperatorsll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	System.out.println();
+	
+	System.out.print("Logical Operators: ");
+	for(int i=0;i<logicaloperatorsll.size();i++){
+		System.out.print(logicaloperatorsll.get(i));
+		if(i+1 == logicaloperatorsll.size()){
+		
+	}else{
+		System.out.print(" , ");
+	}
+	}
+	System.out.println();
+	
+	System.out.print("Brackets: ");
+	for(int i=0;i<bracketsll.size();i++){
+		System.out.print(bracketsll.get(i));
+		if(i+1 == bracketsll.size()){
+		
+		}else{
+		System.out.print(" , ");
+		}
+	}
+	System.out.println();
+	
+	System.out.print("Others: ");
+	for(Object o : othershs){
+		System.out.print(o+" , ");
+	}
+	System.out.println();
+	
+	
+%eof}
+
+
+
+%%
+//rules
+
+ "stdio.h" {keywordsll.add("stdio.h");} // catch sdtio.h
+
+ // for all the rules, first checking if the string flag is true, to decide whether they are keywords or part of a string
+ 
+\" { // catch "
+	if(stringflag){
+		//end qmark
+		stringflag = false;
+		stringsll.add(string);
+		string = "";
+	}else{
+		//start qmark
+		stringflag = true;
+	}
+}
+
+{whitespace} {
+	if(stringflag){
+		string += yytext();
+	}
+	
+	}
+
+{numbers} {
+	if(stringflag){
+		string += yytext();
+	}else{
+		numbersll.add(yytext());
+	}
+	
+}
+
+{keywordswithdot} {
+
+	if(stringflag){
+		string += yytext();
+	}else{
+		String str = yytext().trim();
+	boolean flag = false;
+	for(int i=0;i<functionsarray.length;i++){
+		if(functionsarray[i].equals(str)){
+			functionsll.add(str);
+			flag = true;
+			break;
+		}
+	}
+	if(!flag){
+		for(int i=0;i<keywordsarray.length;i++){
+		if(keywordsarray[i].equals(str)){
+			keywordsll.add(str);
+			flag = true;
+			break;
+		}
+	}
+	}
+	
+	if(!flag){
+		identifiersll.add(str);
+	}
+	}
+	
+	
+}
+
+
+{moperators} {
+	if(stringflag){
+		string += yytext();
+	}else{
+	mathoperatorsll.add(yytext());
+	}
+	
+}
+
+{loperators} {
+
+	if(stringflag){
+		string += yytext();
+	}else{
+	logicaloperatorsll.add(yytext());
+	}
+	
+}
+{bracket} {
+
+	if(stringflag){
+		string += yytext();
+	}else{
+	bracketsll.add(yytext());
+	}
+	
+}
+
+. {
+
+	if(stringflag){
+		string += yytext();
+	}else{
+	othershs.add(yytext());
+	}
+	
+}
+
